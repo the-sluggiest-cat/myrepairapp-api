@@ -47,6 +47,7 @@ class InventoryItemCategory(enum.Enum):
     DEVICE = "Device"
     ACCESSORY = "Accessory"
     SERVICE = "Service"
+    TOOL = "Tool"
 
     @classmethod
     def get_from_string(cls, input_str: str | None) -> "InventoryItemCategory | None":

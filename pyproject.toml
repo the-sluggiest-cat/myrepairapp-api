@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "myrepairapp-api"
-version = "0.0.0"
+name = "myrepairapp"
+version = "0.0.1"
 description = "A Python wrapper for MyRepairApp that uses their public API."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -24,15 +24,6 @@ classifiers = [
 dependencies = [
     "requests",
     "rich",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = [
-    "src/__init__.py",
-    "src/api.py",
-    "src/checkin_ticket.py",
-    "src/exceptions.py",
-    "src/inventory_item.py",
 ]
 
 [project.urls]
