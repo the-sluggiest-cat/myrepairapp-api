@@ -1,0 +1,45 @@
+[build-system]
+requires = ["requests, rich"]
+build-backend = "hatchling.build"
+
+[project]
+name = "myrepairapp-api"
+version = "0.0.0"
+description = "A Python wrapper for MyRepairApp that uses their public API."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "scooglat", email = "jaanov2013@gmail.com" },
+]
+maintainers = [
+    { name = "scooglat", email = "jaanov2013@gmail.com" },
+]
+keywords = ["python", "package", "myrepairapp", "wrapper]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "rich",
+]
+
+[project.urls]
+Documentation = "https://my-awesome-package.readthedocs.io/"
+Repository = "https://github.com/my-user/my-awesome-package"
+Issues = "https://github.com/my-user/my-awesome-package/issues"
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["my_awesome_package"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+testpaths = ["tests"]
