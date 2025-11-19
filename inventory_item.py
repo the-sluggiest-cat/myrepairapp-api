@@ -299,7 +299,6 @@ def item_from_json(data: dict) -> InventoryItem:
     item_type = InventoryItemType.get_from_string(data.get("type"))
     
     # Pass arguments by name, which is clearer than positional arguments
-    # Note: If InventoryItem used dataclasses and snake_case, this would also improve.
     return InventoryItem(
         item_id = data.get("id"),
         store_id = data.get("storeId"),
@@ -324,7 +323,7 @@ def item_from_json(data: dict) -> InventoryItem:
         carrier = data.get("carrier"),
         color = data.get("color"),
         storage = data.get("storage"),
-        trade_in_condition = data.get("tradeInCondition"), # Needs to be parsed like 'condition'
+        trade_in_condition = data.get("tradeInCondition"), # Needs to be parsed like 'condition'... eventually
         trade_in_status = data.get("tradeInStatus"),
         additional_info = data.get("additionalInfo"),
         is_rebate = data.get("isRebate"),
