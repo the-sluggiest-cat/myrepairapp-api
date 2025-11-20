@@ -1,5 +1,28 @@
-import enum
-from dataclasses import dataclass
+import enum, json
+from enum import Enum
+from dataclasses import dataclass, asdict
+
+if __name__ == "inventory_item":
+    # import generic
+    pass
+else:
+    from . import generic
+
+class InventoryJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle Enum members and dataclasses."""
+    def default(self, obj):
+        # Handle all Enum members (Condition, Category, etc.)
+        if isinstance(obj, Enum):
+            return obj.value # Serialize the Enum using its string value
+
+        # Handle nested dataclass objects (like trade_in_device)
+        if isinstance(obj, InventoryItem):
+            # Recursively convert the dataclass to a dictionary
+            # The encoder will then run the dict through this same logic
+            return asdict(obj) 
+            
+        # Let the base class handle other objects (like datetime)
+        return json.JSONEncoder.default(self, obj)
 
 class InventoryItemCondition(enum.Enum):
     """
@@ -47,7 +70,6 @@ class InventoryItemCategory(enum.Enum):
     DEVICE = "Device"
     ACCESSORY = "Accessory"
     SERVICE = "Service"
-    TOOLS = "Tools"
     TOOL = "Tool"
 
     @classmethod
@@ -75,14 +97,14 @@ class InventoryItemType:
         - "OTHER" - Repair is done on a device that falls outside of these classifications.
         """
 
-        PHONE = "Phone"
-        TABLET = "Tablet"
-        LAPTOP = "Laptop"
-        COMPUTER = "Computer"
-        GAME = "Game"
-        DRONE = "Drone"
-        MISCELLANEOUS = "Miscellaneous"
-        OTHER = "Other"
+        PHONE = "Repair - Phone"
+        TABLET = "Repair - Tablet"
+        LAPTOP = "Repair - Laptop"
+        COMPUTER = "Repair - Computer"
+        GAME = "Repair - Game"
+        DRONE = "Repair - Drone"
+        MISCELLANEOUS = "Repair - Miscellaneous"
+        OTHER = "Repair - Other"
 
         @classmethod
         def get_from_string(cls, input_str: str | None) -> "InventoryItemType.RepairItem | None":
@@ -234,6 +256,15 @@ class InventoryItemType:
                 return cls[input_str.upper().replace(' ', '_')]
             except KeyError:
                 raise ValueError(f"{input_str} isn't a valid device type!")
+            
+    class ToolItem(enum.Enum):
+        """Urgh."""
+
+        TOOL = "Tool"
+
+        @classmethod
+        def get_from_string(cls, input_str: str | None) -> "InventoryItemType.DeviceItem | None":
+            return cls["TOOL"]
     
     def get_from_string(input: str | None) -> "InventoryItemType":
         if input is None: return None
@@ -242,6 +273,7 @@ class InventoryItemType:
         try:
             item_type, item = [s.strip() for s in input.split("-", 1)]
         except ValueError:
+            if input.upper() == "TOOLS": return InventoryItemType.ToolItem.get_from_string(input)
             raise ValueError("Input must be in 'CATEGORY - TYPE' format")
         if item_type.upper() not in ["REPAIR", "DEVICE", "PREPAID", "PART", "ACCESSORY", "SERVICE"]:
             raise ValueError(f"{item_type} is not a valid type!")
@@ -255,7 +287,7 @@ class InventoryItemType:
 
 # BEHOLD. THE NIGHTMARES.
 @dataclass(repr=True)
-class InventoryItem:
+class InventoryItem(generic.GenericItem):
     """A MyRepairApp inventory item. This handles organization, inventory counts, price, cost, etcetera."""
     item_id = None; store_id = None; sku = None; manufacturer = None; type = None; name = None; in_stock = None; condition = None; bin = None; supplier_id = None
     price = None; created_at = None; updated_at = None; note = None; inventoried = None; serialized = None; active = None; cost = None; category = None; serial_num = None
@@ -272,6 +304,8 @@ class InventoryItem:
                  # relevance: int = None, # can likely be ignored, this is a by-query basis
                  pulled: bool = None, ordered: bool = None, back_ordered: bool = None, sku_pulled: bool = None, sku_instock: bool = None):
         
+        super().__init__("inventory")
+        
         self.item_id = item_id; self.store_id = store_id; self.sku = sku; self.manufacturer = manufacturer; self.type = item_type; self.name = name; self.in_stock = in_stock
         self.condition = condition; self.bin = bin; self.supplier_id = supplier_id; self.price = price
         # - todo: translate the below into datetime instances -
@@ -286,6 +320,29 @@ class InventoryItem:
     
     def __repr__(self):
         return self.name
+    
+    def export(self):
+        raw_dump = json.loads(json.dumps(self.__dict__, cls=InventoryJSONEncoder)) # awful.
+        returned = raw_dump
+        del returned["ITEM_TYPE"]
+        returned["id"] = returned["item_id"]; del returned["item_id"]
+        returned["storeId"] = returned["store_id"]; del returned["store_id"]
+        print(returned)
+        return returned
+
+    
+    # def __dict__(self):
+    #     return {
+    #         "id": self.item_id,
+    #         "storeId": self.store_id,
+    #         "sku": self.sku,
+    #         "manufacturer": self.manufacturer,
+    #         "item_type": self.type,
+    #         "name": self.name,
+    #         "instock": self.in_stock,
+    #         "condition": self.condition,
+
+    #     }
 
 def item_from_json(data: dict) -> InventoryItem:
     # Use .get() for optional keys

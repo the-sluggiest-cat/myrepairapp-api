@@ -1,6 +1,11 @@
-import inventory_item, enum
-from inventory_item import InventoryItem
+import enum
 
+if __name__ == "checkin_ticket":
+    pass
+    # from inventory_item import InventoryItem, item_from_json
+else:
+    from .inventory_item import InventoryItem, item_from_json
+    
 class CheckinTicketActivity:
     jsonID = None; checkinTicketID = None; userID = None; activity_type = None; metadata = None; createdAt = None
 
@@ -64,7 +69,7 @@ class CheckInTicket:
     
     def __repr__(self):
         if len(self.checkinItems) > 0:
-            self.checkinItems = [inventory_item.item_from_json(item["inventoryItem"]) for item in self.checkinItems]
+            self.checkinItems = [item_from_json(item["inventoryItem"]) for item in self.checkinItems]
         else: self.checkinItems = "NO ITEMS"
         return str(self.__dict__)
 
