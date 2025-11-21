@@ -6,7 +6,7 @@
 MyRepairApp.py
 ==============
 
-A Python wrapper for MyRepairApp that uses their `public API <https://www.myrepairapp.com/api-docs/public-api>`.
+A Python wrapper for MyRepairApp that uses their `public API <https://www.myrepairapp.com/api-docs/public-api>`_.
 
 Very little assistance provided by Gemini for code suggestions. 99.8% of the codebase was written by humans.
 
